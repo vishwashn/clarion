@@ -5,7 +5,8 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  ScrollView
+  ScrollView,
+  Picker
 } from "react-native";
 import font from "../constants/font";
 import Colors from "../constants/Colors";
@@ -23,7 +24,8 @@ class Home extends Component {
     rateError: "",
     qualityError: "",
     id: 0,
-    dialogVisible: false
+    dialogVisible: false,
+    userName: this.props.navigation.state.params.userName
   };
   init = {
     name: "",
@@ -34,6 +36,7 @@ class Home extends Component {
     qualityError: "",
     dialogVisible: false
   };
+  qualityData = [1, 2, 3];
   addProduct = () => {
     let {
       name,
@@ -49,7 +52,7 @@ class Home extends Component {
     else nameError = "";
     if (rate === "") rateError = "Can not be blank";
     else rateError = "";
-    if (quality === "") qualityError = "Can not be blank";
+    if (quality === "") qualityError = "Select quality";
     else qualityError = "";
     if (name !== "" && rate !== "" && quality !== "")
       this.setState({
@@ -95,14 +98,7 @@ class Home extends Component {
     this.setState({ dialogVisible: true });
   };
   renderDialog = () => {
-    const {
-      name,
-      rate,
-      quality,
-      nameError,
-      rateError,
-      qualityError
-    } = this.state;
+    const { name, rate, quality, nameError, rateError, qualityError } = this.state;
     return (
       <Dialog.Container
         style={styles.screen}
@@ -154,19 +150,29 @@ class Home extends Component {
           </View>
           <View style={styles.formControl}>
             <Text style={styles.label}>Quality</Text>
-            <View style={{ flexDirection: "row" }}>
-              <TextInput
-                style={styles.input}
-                value={quality}
-                keyboardType="default"
-                autoCapitalize="none"
-                placeholder="Quality"
-                placeholderTextColor="#202020"
-                onChangeText={quality => {
-                  this.setState({ quality });
-                }}
+            <Picker
+              itemStyle={styles.itemStyle}
+              mode="dropdown"
+              style={styles.pickerStyle}
+              selectedValue={quality}
+              onValueChange={val => this.setState({ quality: val })}
+            >
+              <Picker.Item
+                color="black"
+                label="Select quality"
+                value=""
+                index={0}
               />
-            </View>
+              {this.qualityData.map(q => (
+                <Picker.Item
+                  color="black"
+                  key={q}
+                  label={q.toString()}
+                  value={q}
+                  index={q}
+                />
+              ))}
+            </Picker>
             {qualityError !== "" && (
               <View style={styles.errorContainer}>
                 <Text style={styles.errorText}>{qualityError}</Text>
@@ -180,18 +186,19 @@ class Home extends Component {
     );
   };
   render() {
-    const { products } = this.state;
+    const { products, userName } = this.state;
     return (
       <KeyboardAvoidingView behavior="padding" style={styles.gradient} enabled>
         {this.renderDialog()}
         <ScrollView>
           <View style={styles.homeContainer}>
+            <Text style={styles.heading}>Welcome {userName}</Text>
             <Text style={styles.heading}>Dashboard</Text>
             <View>
               <Button
                 mode="text"
                 color={Colors.textColor}
-                style={[styles.borderContainer, { backgroundColor: "green" }]}
+                style={[styles.borderContainer, { backgroundColor: "#e7e7e7" }]}
                 onPress={() => this.setState({ dialogVisible: true })}
               >
                 Add New Product
@@ -254,12 +261,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 10
-  },
-  authContainer: {
-    width: "80%",
-    maxWidth: 400,
-    padding: 20,
-    backgroundColor: Colors.card_bg
   },
   buttonContainer: {
     marginTop: 10

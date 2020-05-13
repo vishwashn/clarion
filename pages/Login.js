@@ -27,7 +27,7 @@ class AuthScreen extends Component {
     let passwordError = "";
     this.state.err = null;
     if (!email && email.trim().length === 0) {
-      emailError = "User ID is required";
+      emailError = "Email ID is required";
     } else {
       if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))
         emailError = "Email ID is not valid";
@@ -38,95 +38,108 @@ class AuthScreen extends Component {
       if (!/(?=.*[A-Z])/.test(password))
         passwordError = "Password should contain one uppercase letter";
     }
+    if (emailError === "" && passwordError === "") {
+      if (
+        !(
+          email.toLowerCase() === "clarion@clarion.com" &&
+          password === "Clarion123"
+        )
+      ) {
+        passwordError = "Email ID or Password is incorrect";
+      }
+    }
     if (
       emailError === "" &&
       passwordError === "" &&
       email.toLowerCase() === "clarion@clarion.com" &&
       password === "Clarion123"
     )
-      this.props.navigation.navigate("Home");
+      this.props.navigation.navigate("Home", { userName: email });
     else this.setState({ emailError, passwordError });
   };
   render() {
     const { emailError, passwordError } = this.state;
     return (
-      <KeyboardAvoidingView behavior="padding" style={styles.gradient} enabled>
-        <Card style={styles.authContainer}>
-          <View
-            style={{
-              backgroundColor: "transparent",
-              alignItems: "center"
-            }}
-          ></View>
+      <KeyboardAvoidingView behavior="paddding" style={styles.screen}>
+        <View style={styles.gradient}>
+          <Card style={styles.authContainer}>
+            <View
+              style={{
+                backgroundColor: "transparent",
+                alignItems: "center"
+              }}
+            ></View>
 
-          <View style={styles.formControl}>
-            <Text style={styles.label}>User ID</Text>
-            <View style={{ flexDirection: "row" }}>
-              <TextInput
-                style={styles.input}
-                value={this.state.email}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                placeholder={"User ID"}
-                placeholderTextColor="#202020"
-                onChangeText={text => {
-                  this.setState({ email: text });
-                }}
-              />
-              <FontAwesome
-                name={this.state.hidePassword ? "eye-slash" : "eye"}
-                size={18}
-                color="transparent"
-              />
-            </View>
-            {emailError !== "" && (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{emailError}</Text>
+            <View style={styles.formControl}>
+              <Text style={styles.label}>Email ID</Text>
+              <View style={{ flexDirection: "row" }}>
+                <TextInput
+                  style={styles.input}
+                  value={this.state.email}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholder={"Email ID"}
+                  placeholderTextColor="#202020"
+                  onChangeText={text => {
+                    this.setState({ email: text });
+                  }}
+                />
+                <FontAwesome
+                  name={this.state.hidePassword ? "eye-slash" : "eye"}
+                  size={18}
+                  color="transparent"
+                />
               </View>
-            )}
-          </View>
-          <View style={styles.formControl}>
-            <Text style={styles.label}>Password</Text>
-            <View style={{ flexDirection: "row" }}>
-              <TextInput
-                style={styles.input}
-                value={this.state.password}
-                keyboardType="default"
-                placeholder={"Password"}
-                placeholderTextColor="#202020"
-                secureTextEntry={this.state.hidePassword}
-                onChangeText={text => {
-                  this.setState({ password: text });
-                }}
-              />
-              <FontAwesome
-                name={this.state.hidePassword ? "eye-slash" : "eye"}
-                size={18}
+              {emailError !== "" && (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{emailError}</Text>
+                </View>
+              )}
+            </View>
+            <View style={styles.formControl}>
+              <Text style={styles.label}>Password</Text>
+              <View style={{ flexDirection: "row" }}>
+                <TextInput
+                  style={styles.input}
+                  value={this.state.password}
+                  keyboardType="default"
+                  placeholder={"Password"}
+                  placeholderTextColor="#202020"
+                  secureTextEntry={this.state.hidePassword}
+                  onChangeText={text => {
+                    this.setState({ password: text });
+                  }}
+                />
+                <FontAwesome
+                  name={this.state.hidePassword ? "eye-slash" : "eye"}
+                  size={18}
+                  color={Colors.textColor}
+                  onPress={() => {
+                    this.setState({
+                      hidePassword: !this.state.hidePassword
+                    });
+                  }}
+                />
+              </View>
+              {passwordError !== "" && (
+                <View style={styles.errorContainer} key={1}>
+                  <Text style={styles.errorText}>{passwordError}</Text>
+                </View>
+              )}
+            </View>
+            <View style={{ backgroundColor: "transparent" }}>
+              <Button
+                mode="text"
                 color={Colors.textColor}
-                onPress={() => {
-                  this.setState({
-                    hidePassword: !this.state.hidePassword
-                  });
-                }}
-              />
+                style={[styles.borderContainer, { backgroundColor: "#01DFA5" }]}
+                onPress={this.authHandler}
+              >
+                Login{" "}
+                <Feather name="log-in" size={18} color={Colors.textColor} />
+              </Button>
             </View>
-            {passwordError !== "" && (
-              <View style={styles.errorContainer} key={1}>
-                <Text style={styles.errorText}>{passwordError}</Text>
-              </View>
-            )}
-          </View>
-          <View style={{ backgroundColor: "transparent" }}>
-            <Button
-              mode="text"
-              color={Colors.textColor}
-              style={[styles.borderContainer, { backgroundColor: "#01DFA5" }]}
-              onPress={this.authHandler}
-            >
-              Login <Feather name="log-in" size={18} color={Colors.textColor} />
-            </Button>
-          </View>
-        </Card>
+          </Card>
+        </View>
       </KeyboardAvoidingView>
     );
   }
